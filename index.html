@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/move.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+			window.onload = function() {
+				//游戏界面
+				var pillar = document.getElementsByClassName("pillar");
+				var pillarBox = document.getElementById("pillarBox");
+				var bird = document.getElementById("bird");
+				
+				//common
+					//左右,上下,速度  
+					var leftDis = 400;
+					var topDis = 400;
+					var speed =1;
+					bird.stop=false;
+					
+				
+				
+				
+				//分数界面
+				//
+				var control=document.getElementById('stop');
+				//
+				var h2s=document.getElementsByTagName("h2");
+				//
+				var forSpeed=document.getElementsByClassName("speed");
+				//
+				var forLeft=document.getElementsByClassName("leftDis");
+				//
+				var forTop=document.getElementsByClassName("topDis");
+				
+				
+				control.onclick=function(){
+					
+					for(var i=0;i<forLeft.length;i++){
+						forSpeed[i].disabled=!forSpeed[i].disabled;
+						forLeft[i].disabled=!forLeft[i].disabled;
+						forTop[i].disabled=!forTop[i].disabled;
+					}
+					this.value=forTop[0].disabled?"开始":"暂停";
+					bird.stop=forTop[0].disabled;
+					pillarBox.stop=orTop[0].disabled;
+				}
+				
+				
+			
+
+				bird.isDie = false;
+				bird.score = 0;
+				//该数组用来存储  每个柱子上部分的最下部分top  和  柱子下部分的最上部分的top
+				pillarBox.spaceInPillar = [];
+				var diffcult = 0;
+				//该数组用来存储 每个柱子的相对于pillarBox的left
+				//柱子相对于bg的left   =   他相对于pillarBox的left  +   pillarBox.offsetLeft
+				pillarBox.pillarLeft = [];
+
+
+				GOGOGO();
+
+				function GOGOGO() {
+					pillarBox.spaceInPillar = [];
+					pillarBox.pillarLeft = [];
+
+
+					//初始化pillarBox的位子
+					var pBoxLeft = pillarBox.parentNode.offsetWidth;
+					pillarBox.style.left = pBoxLeft + "px";
+					//初始化柱子的排列方式
+					//  左右距离  上下距离 
+					arrayPillar(pillar, leftDis, topDis, pillarBox.spaceInPillar, pillarBox.pillarLeft);
+					//移动柱子
+					move(pillarBox, bird, "left", -(pillarBox.offsetWidth), speed, function(o) {
+						//move(objP,objB,attr,target,speed,fn)
+						if(!bird.isDie) {
+							diffcult++;
+							setTimeout(function() {
+								GOGOGO()
+							}, 2000);
+						}
+
+					});
+
+				}
+
+				window.onkeydown = function(e) {
+					console.log(e.keyCode);
+					e = e || event;
+					//飞       空格
+				
+					switch(e.keyCode){
+						//空格   飞
+						case 32:flying(bird, 8, bird.parentNode.offsetHeight);
+						break;
+						
+						//柱子上下距离加宽
+						case 38:topDis=topDis+50;
+						break;
+						case 40:topDis=topDis-50;
+						break;
+						
+						//柱子左右距离
+						case 39:leftDis=leftDis+50;
+						break;
+						case 37:leftDis=leftDis-50;
+						break;
+						
+						//速度
+						case 96:speed=speed+0.2;
+						break;
+						case 110:speed=speed-0.2;
+					}
+				}
+			}
+		</script>
+		<style type="text/css">
+			body {
+				height: 800px;
+				min-width: 1100px;
+				max-width: 1100px;
+				background: black;
+				padding: 20px;
+				margin: 0;
+				clear: both;
+			}
+			
+			#gameBox {
+				height: 100%;
+				width: 80%;
+				float: right;
+				position: relative;
+			}
+			
+			#mark {
+				width: 15%;
+				height: 100%;
+				background: white;
+				float: left;
+				position: relative;
+			}
+			
+			#bg {
+				width: 100%;
+				background: url(img/bg.png) center;
+				height: 90%;
+				position: relative;
+				overflow: hidden;
+			}
+			
+			#ground {
+				width: 100%;
+				height: 10%;
+				background: url(img/ground.png);
+			}
+			
+			#bird {
+				position: absolute;
+				width: 40px;
+				height: 30px;
+				background: url(img/1.gif);
+				left: 200px;
+				top: 100px;
+			}
+			
+			#pillarBox {
+				position: absolute;
+				height: 100%;
+				left: 0px;
+			}
+			
+			.pillar {
+				position: absolute;
+				width: 131px;
+				height: 100%;
+				top: 0;
+			}
+			
+			.ttt {
+				position: absolute;
+				background: url(img/top.png) bottom left;
+				display: block;
+				width: 100%;
+				height: 40%;
+				top: 0;
+			}
+			
+			.bbb {
+				position: absolute;
+				background: url(img/bottom.png) top left;
+				display: block;
+				width: 100%;
+				height: 40%;
+				bottom: 0
+			}
+			
+			input {
+				display: block;
+				height: 30px;
+				width: 50px;
+				margin: 10px auto;
+			}
+			
+			#stop {
+				background: red;
+			}
+			
+			h2 {
+				font-size: 18px
+			}
+			
+			hr {
+				margin: 30px 0;
+				border-width: 2px
+			}
+			
+			.speed,
+			.leftDis,
+			.topDis {
+				background: #1874CD;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="gameBox">
+			<div id="bg">
+
+				<div id="bird"></div>
+
+				<div id="pillarBox">
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+
+					<div class="pillar"><span class="ttt"></span><span class="bbb"></span></div>
+				</div>
+
+			</div>
+
+			<div id="ground">
+
+			</div>
+		</div>
+
+		<div id="mark">
+			<input type="button" id="stop" value="暂停" />
+
+			<h2>当前分数:0</h2>
+			<hr />
+
+			<input type="button" class="speed" value="+" /><input type="button" class="speed" value="-" />
+			<h2>当前速度:0</h2>
+
+			<hr />
+
+			<input type="button" class="leftDis" value="+" /><input type="button" class="leftDis" value="-" />
+			<h2>当前左右间距:0</h2>
+
+			<hr />
+
+			<input type="button" class="topDis" value="+" /><input type="button" class="topDis" value="-" />
+			<h2>当前上下间距:0</h2>
+
+		</div>
+	</body>
+
+</html>
